@@ -16,7 +16,7 @@ const CreditModal = ({ isOpen, onClose }) => {
 
                 <div className="profile-avatar-small">
                     <img
-                        src="https://cdn.discordapp.com/avatars/331409786394836992/0a5d881605e2c49d49820140822d7d53.png?size=1024"
+                        src="https://cdn.discordapp.com/avatars/1195754440955793442/337c3115ee427d5f8bccbaf16cb19a8d.png?size=1024"
                         alt="Local"
                         style={{ width: '100%', height: '100%', borderRadius: '50%' }}
                     />
@@ -26,8 +26,7 @@ const CreditModal = ({ isOpen, onClose }) => {
                     <h2 className="profile-name-small">Local</h2>
                     <p className="profile-handle-small">@barronxsl</p>
                     <p className="profile-bio-small">
-                        Full Stack Developer<br />
-                        Building cool things with code.
+                        Owner Website
                     </p>
                 </div>
             </div>
