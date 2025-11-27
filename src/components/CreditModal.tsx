@@ -1,6 +1,9 @@
-import React from 'react';
+interface CreditModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
 
-const CreditModal = ({ isOpen, onClose }) => {
+const CreditModal = ({ isOpen, onClose }: CreditModalProps) => {
     if (!isOpen) return null;
 
     return (

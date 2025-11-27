@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 
+export interface HistoryItem {
+    id: number;
+    link: string;
+    preview: string;
+    targetVar: string;
+    timestamp: string;
+}
+
 export const useHistory = () => {
-    const [history, setHistory] = useState([]);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
 
     useEffect(() => {
         const saved = localStorage.getItem('link_history');
@@ -14,8 +22,8 @@ export const useHistory = () => {
         }
     }, []);
 
-    const addToHistory = (link, codeSnippet, targetVar) => {
-        const newItem = {
+    const addToHistory = (link: string, codeSnippet: string, targetVar: string) => {
+        const newItem: HistoryItem = {
             id: Date.now(),
             link,
             preview: codeSnippet.substring(0, 50) + (codeSnippet.length > 50 ? '...' : ''),
@@ -23,7 +31,7 @@ export const useHistory = () => {
             timestamp: new Date().toISOString()
         };
 
-        const updatedHistory = [newItem, ...history].slice(0, 5); // Keep last 5
+        const updatedHistory = [newItem, ...history].slice(0, 100); // Keep last 100
         setHistory(updatedHistory);
         localStorage.setItem('link_history', JSON.stringify(updatedHistory));
     };
@@ -33,7 +41,7 @@ export const useHistory = () => {
         localStorage.removeItem('link_history');
     };
 
-    const removeItem = (id) => {
+    const removeItem = (id: number) => {
         const updatedHistory = history.filter(item => item.id !== id);
         setHistory(updatedHistory);
         localStorage.setItem('link_history', JSON.stringify(updatedHistory));

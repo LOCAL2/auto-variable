@@ -1,42 +1,81 @@
 import { useState, useEffect } from 'react';
-// @ts-ignore
 import Generator from './components/Generator';
-// @ts-ignore
 import Receiver from './components/Receiver';
-// @ts-ignore
+import History from './components/History';
 import CreditModal from './components/CreditModal';
-// @ts-ignore
 import { decompressState } from './utils/urlState';
 import './App.css';
 
-// @ts-ignore
 import { ToastProvider } from './context/ToastContext';
-// @ts-ignore
 import { ThemeProvider } from './context/ThemeContext';
-// @ts-ignore
 import ThemeSwitcher from './components/ThemeSwitcher';
 
+interface Variable {
+  name: string;
+  color: string;
+}
+
+interface AppState {
+  code: string;
+  targetVar?: string;
+  variables?: Variable[];
+  filename?: string; // Added for future feature
+}
+
 function App() {
-  const [decodedState, setDecodedState] = useState<any>(null);
+  const [decodedState, setDecodedState] = useState<AppState | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'generator' | 'receiver' | 'history'>('generator');
 
   useEffect(() => {
-    const handleHashChange = async () => {
+    const handleLoad = async () => {
+      // Check for history page
+      const path = window.location.pathname;
+      if (path === '/history') {
+        setCurrentPage('history');
+        setLoading(false);
+        return;
+      }
+
+      // Check for path-based ID first (Gist)
+      if (path && path.length > 1 && path !== '/') {
+        const gistId = path.substring(1); // Remove leading /
+        try {
+          const { getGist } = await import('./utils/gistService');
+          const state = await getGist(gistId);
+          if (state) {
+            setDecodedState(state);
+            setCurrentPage('receiver');
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error('Failed to load from Gist:', error);
+        }
+      }
+
+      // Fallback to hash-based (original method)
       const hash = window.location.hash;
       if (hash && hash.length > 1) {
         const state = await decompressState(hash);
         setDecodedState(state);
+        setCurrentPage('receiver');
       } else {
         setDecodedState(null);
+        setCurrentPage('generator');
       }
       setLoading(false);
     };
 
-    handleHashChange();
+    handleLoad();
 
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', handleLoad);
+    window.addEventListener('popstate', handleLoad);
+    return () => {
+      window.removeEventListener('hashchange', handleLoad);
+      window.removeEventListener('popstate', handleLoad);
+    };
   }, []);
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -45,11 +84,14 @@ function App() {
     <ThemeProvider>
       <ToastProvider>
         <div className="app-container">
-          {decodedState ? (
+          {currentPage === 'history' ? (
+            <History />
+          ) : currentPage === 'receiver' && decodedState ? (
             <Receiver
               initialCode={decodedState.code}
               targetVar={decodedState.targetVar}
               variables={decodedState.variables}
+              filename={decodedState.filename}
             />
           ) : (
             <Generator />

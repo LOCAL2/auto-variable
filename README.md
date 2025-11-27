@@ -4,7 +4,7 @@ A modern web application for creating shareable code templates with customizable
 
 ## Features
 
-- 🎨 **4 Beautiful Themes**: Deep Blue, Cyberpunk Neon, Clean Light, and OLED Black
+- 🎨 **4 Beautiful Themes**: Deep Blue, Cyberpunk Neon, and OLED Black
 - 🔍 **Smart Language Detection**: Auto-detects 10+ programming languages
 - 📱 **QR Code Generation**: Instant QR codes for mobile sharing
 - 📜 **History Management**: Tracks your last 5 generated links

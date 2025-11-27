@@ -1,6 +1,10 @@
-import React from 'react';
+interface ToastProps {
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    onClose: () => void;
+}
 
-const Toast = ({ message, type, onClose }) => {
+const Toast = ({ message, type, onClose }: ToastProps) => {
     return (
         <div className={`toast toast-${type} fade-in-slide`}>
             <div className="toast-icon">

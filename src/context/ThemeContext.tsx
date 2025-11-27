@@ -1,12 +1,23 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-const ThemeContext = createContext();
+interface ThemeContextType {
+    currentTheme: string;
+    setTheme: (theme: string) => void;
+}
 
-export const useTheme = () => useContext(ThemeContext);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }) => {
+export const useTheme = () => {
+    const context = useContext(ThemeContext);
+    if (!context) {
+        throw new Error('useTheme must be used within a ThemeProvider');
+    }
+    return context;
+};
+
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // Default to 'default' (Deep Blue)
-    const [currentTheme, setCurrentTheme] = useState(() => {
+    const [currentTheme, setCurrentTheme] = useState<string>(() => {
         return localStorage.getItem('app-theme') || 'default';
     });
 
@@ -19,7 +30,7 @@ export const ThemeProvider = ({ children }) => {
         localStorage.setItem('app-theme', currentTheme);
     }, [currentTheme]);
 
-    const setTheme = (theme) => {
+    const setTheme = (theme: string) => {
         setCurrentTheme(theme);
     };
 
