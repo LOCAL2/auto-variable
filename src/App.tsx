@@ -19,7 +19,7 @@ interface AppState {
   code: string;
   targetVar?: string;
   variables?: Variable[];
-  filename?: string; // Added for future feature
+  filename?: string;
 }
 
 function App() {
@@ -30,7 +30,6 @@ function App() {
 
   useEffect(() => {
     const handleLoad = async () => {
-      // Check for history page
       const path = window.location.pathname;
       if (path === '/history') {
         setCurrentPage('history');
@@ -38,9 +37,29 @@ function App() {
         return;
       }
 
-      // Check for path-based ID first (Gist)
       if (path && path.length > 1 && path !== '/') {
-        const gistId = path.substring(1); // Remove leading /
+        let gistId = path.substring(1);
+        
+        // Check if it's a short URL (starts with 's/')
+        if (gistId.startsWith('s/')) {
+          const shortCode = gistId.substring(2);
+          try {
+            const { resolveShortUrl } = await import('./utils/shortUrlService');
+            const resolvedGistId = await resolveShortUrl(shortCode);
+            if (resolvedGistId) {
+              gistId = resolvedGistId;
+            } else {
+              console.error('Short URL not found');
+              setLoading(false);
+              return;
+            }
+          } catch (error) {
+            console.error('Failed to resolve short URL:', error);
+            setLoading(false);
+            return;
+          }
+        }
+        
         try {
           const { getGist } = await import('./utils/gistService');
           const state = await getGist(gistId);

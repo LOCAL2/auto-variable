@@ -18,6 +18,7 @@ const Generator = () => {
     const [variables, setVariables] = useState<Variable[]>([{ name: '', color: COLORS[0] }]);
     const [filename, setFilename] = useState<string>('');
     const [generatedLink, setGeneratedLink] = useState<string>('');
+    const [shortLink, setShortLink] = useState<string>('');
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
     const { showToast } = useToast();
     const { history, addToHistory } = useHistory();
@@ -70,11 +71,23 @@ const Generator = () => {
                 
                 const gistId = await Promise.race([gistPromise, timeoutPromise]) as string;
                 link = `${window.location.origin}/${gistId}`;
+                
+                // Try to create short URL
+                try {
+                    const { createShortUrl } = await import('../utils/shortUrlService');
+                    const shortCode = await createShortUrl(gistId);
+                    const shortUrl = `${window.location.origin}/s/${shortCode}`;
+                    setShortLink(shortUrl);
+                } catch (shortError) {
+                    console.log('Short URL creation failed:', shortError);
+                    setShortLink('');
+                }
             } catch (gistError) {
                 console.log('Gist failed, using hash fallback:', gistError);
                 usedFallback = true;
                 const hash = await compressState(state);
                 link = `${window.location.origin}/#${hash}`;
+                setShortLink('');
             }
             
             setGeneratedLink(link);
@@ -227,8 +240,22 @@ const Generator = () => {
 
                     {generatedLink && (
                         <div className="result-container fade-in">
+                            {shortLink && (
+                                <div className="input-group">
+                                    <label>✨ Short URL (สั้นที่สุด)</label>
+                                    <input
+                                        type="text"
+                                        value={shortLink}
+                                        readOnly
+                                        onClick={handleFocus}
+                                        className="generated-input"
+                                        style={{ borderColor: '#10b981', background: 'rgba(16, 185, 129, 0.05)' }}
+                                    />
+                                </div>
+                            )}
+                            
                             <div className="input-group">
-                                <label>Shareable Secure Link</label>
+                                <label>{shortLink ? 'Full Link (ลิงก์เต็ม)' : 'Shareable Secure Link'}</label>
                                 <input
                                     type="text"
                                     value={generatedLink}
@@ -239,11 +266,16 @@ const Generator = () => {
                             </div>
 
                             <div className="action-row">
-                                <button className="btn-secondary" onClick={handleCopy}>
+                                <button className="btn-secondary" onClick={() => {
+                                    const linkToCopy = shortLink || generatedLink;
+                                    navigator.clipboard.writeText(linkToCopy).then(() => {
+                                        showToast('คัดลอกลิงก์แล้ว / Link copied!', 'success');
+                                    });
+                                }}>
                                     <FaCopy style={{ marginRight: '0.5rem' }} />
-                                    คัดลอกลิงก์ (Copy Link)
+                                    คัดลอก{shortLink ? 'ลิงก์สั้น' : 'ลิงก์'} (Copy)
                                 </button>
-                                <a href={generatedLink} target="_blank" rel="noreferrer" className="btn-secondary" style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <a href={shortLink || generatedLink} target="_blank" rel="noreferrer" className="btn-secondary" style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <FaExternalLinkAlt style={{ marginRight: '0.5rem' }} />
                                     เปิดลิงก์ (Open)
                                 </a>
@@ -252,7 +284,7 @@ const Generator = () => {
                             <div className="qr-container">
                                 <div className="qr-wrapper" onClick={() => setShowQRModal(true)} style={{ cursor: 'pointer' }}>
                                     <QRCodeCanvas
-                                        value={generatedLink}
+                                        value={shortLink || generatedLink}
                                         size={Math.min(200, window.innerWidth - 100)}
                                         bgColor={"#ffffff"}
                                         fgColor={"#000000"}
@@ -288,7 +320,7 @@ const Generator = () => {
                                 </h3>
                                 <div className="qr-modal-content">
                                     <QRCodeCanvas
-                                        value={generatedLink}
+                                        value={shortLink || generatedLink}
                                         size={Math.min(400, window.innerWidth - 120)}
                                         bgColor={"#ffffff"}
                                         fgColor={"#000000"}
