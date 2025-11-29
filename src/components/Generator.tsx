@@ -106,13 +106,6 @@ const Generator = () => {
         }
     };
 
-    const handleCopy = () => {
-        if (!generatedLink) return;
-        navigator.clipboard.writeText(generatedLink).then(() => {
-            showToast('คัดลอกลิงก์แล้ว / Link copied!', 'success');
-        });
-    };
-
     const handleFocus = (e: React.MouseEvent<HTMLInputElement>) => (e.target as HTMLInputElement).select();
 
     return (
