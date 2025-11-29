@@ -76,7 +76,7 @@ const Generator = () => {
                 try {
                     const { createShortUrl } = await import('../utils/shortUrlService');
                     const shortCode = await createShortUrl(gistId);
-                    const shortUrl = `${window.location.origin}/s/${shortCode}`;
+                    const shortUrl = `${window.location.origin}/data/${shortCode}`;
                     setShortLink(shortUrl);
                 } catch (shortError) {
                     console.log('Short URL creation failed:', shortError);
@@ -233,28 +233,15 @@ const Generator = () => {
 
                     {generatedLink && (
                         <div className="result-container fade-in">
-                            {shortLink && (
-                                <div className="input-group">
-                                    <label>✨ Short URL (สั้นที่สุด)</label>
-                                    <input
-                                        type="text"
-                                        value={shortLink}
-                                        readOnly
-                                        onClick={handleFocus}
-                                        className="generated-input"
-                                        style={{ borderColor: '#10b981', background: 'rgba(16, 185, 129, 0.05)' }}
-                                    />
-                                </div>
-                            )}
-                            
                             <div className="input-group">
-                                <label>{shortLink ? 'Full Link (ลิงก์เต็ม)' : 'Shareable Secure Link'}</label>
+                                <label>{shortLink ? 'Generated Link' : 'Shareable Secure Link'}</label>
                                 <input
                                     type="text"
-                                    value={generatedLink}
+                                    value={shortLink || generatedLink}
                                     readOnly
                                     onClick={handleFocus}
                                     className="generated-input"
+                                    style={shortLink ? { borderColor: '#10b981', background: 'rgba(16, 185, 129, 0.05)', textAlign: 'center' } : { textAlign: 'center' }}
                                 />
                             </div>
 
@@ -266,7 +253,7 @@ const Generator = () => {
                                     });
                                 }}>
                                     <FaCopy style={{ marginRight: '0.5rem' }} />
-                                    คัดลอก{shortLink ? 'ลิงก์สั้น' : 'ลิงก์'} (Copy)
+                                    คัดลอกลิงก์ (Copy Link)
                                 </button>
                                 <a href={shortLink || generatedLink} target="_blank" rel="noreferrer" className="btn-secondary" style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <FaExternalLinkAlt style={{ marginRight: '0.5rem' }} />

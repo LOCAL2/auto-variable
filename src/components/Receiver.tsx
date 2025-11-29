@@ -28,6 +28,7 @@ const Receiver = ({ initialCode, targetVar, variables, filename }: ReceiverProps
 
     const [inputValues, setInputValues] = useState<Record<string, string>>({});
     const [displayCode, setDisplayCode] = useState<string>(initialCode);
+    const [editableFilename, setEditableFilename] = useState<string>(filename || 'code.txt');
     const { showToast } = useToast();
     const [language, setLanguage] = useState<Language>({ name: 'Text', lang: 'text', icon: null });
 
@@ -158,6 +159,41 @@ const Receiver = ({ initialCode, targetVar, variables, filename }: ReceiverProps
                         </div>
                     </div>
 
+                    <div className="input-group">
+                        <label>Filename (ชื่อไฟล์สำหรับดาวน์โหลด)</label>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.75rem',
+                            background: 'rgba(99, 102, 241, 0.05)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(99, 102, 241, 0.2)'
+                        }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent-primary)', flexShrink: 0 }}>
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                <polyline points="13 2 13 9 20 9"></polyline>
+                            </svg>
+                            <input
+                                type="text"
+                                value={editableFilename}
+                                onChange={(e) => setEditableFilename(e.target.value)}
+                                placeholder="filename.txt"
+                                style={{
+                                    flex: 1,
+                                    padding: '0.5rem',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '6px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.9rem',
+                                    outline: 'none',
+                                    fontFamily: 'var(--font-mono)'
+                                }}
+                            />
+                        </div>
+                    </div>
+
                     <div className="action-row">
                         <button className="btn-primary" onClick={handleCopy}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -166,30 +202,28 @@ const Receiver = ({ initialCode, targetVar, variables, filename }: ReceiverProps
                             </svg>
                             <span>คัดลอกโค้ด</span>
                         </button>
-                        {filename && (
-                            <button
-                                className="btn-download"
-                                onClick={() => {
-                                    const blob = new Blob([displayCode], { type: 'text/plain' });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = filename;
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    URL.revokeObjectURL(url);
-                                    showToast(`Downloaded ${filename}`, 'success');
-                                }}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                                <span>ดาวน์โหลดไฟล์</span>
-                            </button>
-                        )}
+                        <button
+                            className="btn-download"
+                            onClick={() => {
+                                const blob = new Blob([displayCode], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = editableFilename;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                                showToast(`Downloaded ${editableFilename}`, 'success');
+                            }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>ดาวน์โหลดไฟล์</span>
+                        </button>
                     </div>
 
                     <div style={{ flex: 1 }}></div>
@@ -207,7 +241,7 @@ const Receiver = ({ initialCode, targetVar, variables, filename }: ReceiverProps
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
-                            Secure Data ID
+                            Secure Link Identifier
                         </label>
                         <div style={{
                             display: 'flex',
@@ -234,13 +268,27 @@ const Receiver = ({ initialCode, targetVar, variables, filename }: ReceiverProps
                                     
                                     // If using Gist (path-based)
                                     if (path && path.length > 1 && path !== '/') {
-                                        return path.substring(1);
+                                        const pathValue = path.substring(1);
+                                        // Format: data/abc123 -> VR-ABC-123
+                                        if (pathValue.startsWith('data/')) {
+                                            const code = pathValue.substring(5).toUpperCase();
+                                            // Split into chunks for better readability: VR-ABC-123
+                                            const formatted = code.match(/.{1,3}/g)?.join('-') || code;
+                                            return `VR-${formatted}`;
+                                        }
+                                        // Format long gist: abc123def456 -> ABC-123-DEF-456
+                                        const upper = pathValue.toUpperCase();
+                                        if (upper.length > 10) {
+                                            const formatted = upper.match(/.{1,3}/g)?.join('-') || upper;
+                                            return `GIST-${formatted}`;
+                                        }
+                                        return `#${upper}`;
                                     }
                                     
                                     // If using hash-based
                                     if (hash && hash.length > 1) {
                                         const hashValue = hash.substring(1);
-                                        return hashValue.length > 30 ? `${hashValue.substring(0, 30)}...` : hashValue;
+                                        return hashValue.length > 30 ? `HASH-${hashValue.substring(0, 12).toUpperCase()}...` : `HASH-${hashValue.toUpperCase()}`;
                                     }
                                     
                                     return 'N/A';

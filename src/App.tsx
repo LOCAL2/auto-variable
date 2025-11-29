@@ -40,9 +40,9 @@ function App() {
       if (path && path.length > 1 && path !== '/') {
         let gistId = path.substring(1);
         
-        // Check if it's a short URL (starts with 's/')
-        if (gistId.startsWith('s/')) {
-          const shortCode = gistId.substring(2);
+        // Check if it's a short URL (starts with 'data/')
+        if (gistId.startsWith('data/')) {
+          const shortCode = gistId.substring(5);
           try {
             const { resolveShortUrl } = await import('./utils/shortUrlService');
             const resolvedGistId = await resolveShortUrl(shortCode);
