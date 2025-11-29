@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/s/:shortCode",
+      "destination": "/index.html"
+    },
+    {
       "source": "/:id",
       "destination": "/index.html"
     }
