@@ -73,32 +73,39 @@ const Generator = () => {
                 link = `${window.location.origin}/${gistId}`;
                 
                 // Try to create short URL
+                let finalLink = link;
                 try {
                     const { createShortUrl } = await import('../utils/shortUrlService');
                     const shortCode = await createShortUrl(gistId);
                     const shortUrl = `${window.location.origin}/data/${shortCode}`;
                     setShortLink(shortUrl);
+                    finalLink = shortUrl; // Use short URL as final link
                 } catch (shortError) {
                     console.log('Short URL creation failed:', shortError);
                     setShortLink('');
                 }
+                
+                setGeneratedLink(link);
+
+                const varLabel = validVariables.map(v => v.name).join(', ');
+                // Save short URL to history if available, otherwise use full URL
+                addToHistory(finalLink, code, varLabel);
             } catch (gistError) {
                 console.log('Gist failed, using hash fallback:', gistError);
                 usedFallback = true;
                 const hash = await compressState(state);
                 link = `${window.location.origin}/#${hash}`;
                 setShortLink('');
+                setGeneratedLink(link);
+
+                const varLabel = validVariables.map(v => v.name).join(', ');
+                addToHistory(link, code, varLabel);
             }
-            
-            setGeneratedLink(link);
 
-            const varLabel = validVariables.map(v => v.name).join(', ');
-            addToHistory(link, code, varLabel);
-
-            if (usedFallback) {
-                showToast('สร้างลิงก์สำเร็จ (ใช้ระบบสำรอง) / Link created (fallback mode)', 'success');
-            } else {
+            if (!usedFallback) {
                 showToast('สร้างลิงก์เรียบร้อยแล้ว / Link generated!', 'success');
+            } else {
+                showToast('สร้างลิงก์สำเร็จ (ใช้ระบบสำรอง) / Link created (fallback mode)', 'success');
             }
         } catch (error) {
             console.error("Generation error:", error);
