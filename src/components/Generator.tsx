@@ -3,8 +3,9 @@ import { compressState } from '../utils/urlState';
 import { useToast } from '../context/ToastContext';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useHistory } from '../hooks/useHistory';
-import { FaHistory, FaPlus, FaTimes, FaFile, FaLink, FaExternalLinkAlt, FaCopy, FaQrcode } from 'react-icons/fa';
+import { FaHistory, FaPlus, FaTimes, FaFile, FaLink, FaExternalLinkAlt, FaCopy, FaQrcode, FaDiscord } from 'react-icons/fa';
 import FileUploader from './FileUploader';
+import DiscordModal from './DiscordModal';
 
 const COLORS = ['#6366f1', '#ec4899', '#14b8a6', '#f59e0b', '#8b5cf6', '#ef4444'];
 
@@ -20,6 +21,7 @@ const Generator = () => {
     const [generatedLink, setGeneratedLink] = useState<string>('');
     const [shortLink, setShortLink] = useState<string>('');
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
+    const [showDiscordModal, setShowDiscordModal] = useState<boolean>(false);
     const { showToast } = useToast();
     const { history, addToHistory } = useHistory();
 
@@ -268,6 +270,19 @@ const Generator = () => {
                                 </a>
                             </div>
 
+                            <button 
+                                className="btn-discord" 
+                                onClick={() => setShowDiscordModal(true)}
+                                style={{
+                                    marginTop: '0.75rem',
+                                    background: 'linear-gradient(135deg, #5865F2, #7289DA)',
+                                    border: 'none'
+                                }}
+                            >
+                                <FaDiscord style={{ marginRight: '0.5rem' }} />
+                                ส่งไปยัง Discord (Send to Discord)
+                            </button>
+
                             <div className="qr-container">
                                 <div className="qr-wrapper" onClick={() => setShowQRModal(true)} style={{ cursor: 'pointer' }}>
                                     <QRCodeCanvas
@@ -320,6 +335,12 @@ const Generator = () => {
                             </div>
                         </>
                     )}
+
+                    <DiscordModal 
+                        isOpen={showDiscordModal}
+                        onClose={() => setShowDiscordModal(false)}
+                        url={shortLink || generatedLink}
+                    />
 
 
                 </div>

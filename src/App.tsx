@@ -97,12 +97,24 @@ function App() {
     };
   }, []);
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return (
+    <div className="loading-screen">
+      <div className="loading-content">
+        <div className="loading-spinner">
+          <div className="spinner-ring"></div>
+          <div className="spinner-ring"></div>
+          <div className="spinner-ring"></div>
+        </div>
+        <h2 className="loading-title">Variable Replacer</h2>
+        <p className="loading-text">Loading your code template...</p>
+      </div>
+    </div>
+  );
 
   return (
     <ThemeProvider>
       <ToastProvider>
-        <div className="app-container">
+        <>
           {currentPage === 'history' ? (
             <History />
           ) : currentPage === 'receiver' && decodedState ? (
@@ -130,7 +142,7 @@ function App() {
           </button>
 
           <CreditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        </div>
+        </>
       </ToastProvider>
     </ThemeProvider>
   );
