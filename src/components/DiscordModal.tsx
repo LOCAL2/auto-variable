@@ -44,7 +44,8 @@ const DiscordModal = ({ isOpen, onClose, url }: DiscordModalProps) => {
             const embed = {
                 embeds: [{
                     author: {
-                        name: displayName
+                        name: `ผู้ส่ง: ${displayName}`,
+                        icon_url: 'https://cdn-icons-png.flaticon.com/512/6681/6681204.png'
                     },
                     title: title,
                     description: `\`\`\`\n${url}\n\`\`\``,
@@ -101,6 +102,16 @@ const DiscordModal = ({ isOpen, onClose, url }: DiscordModalProps) => {
                     </div>
 
                     <div className="input-group">
+                        <label>Your Name (ชื่อผู้ส่ง)</label>
+                        <input
+                            type="text"
+                            value={senderName}
+                            onChange={(e) => setSenderName(e.target.value)}
+                            placeholder="Anonymous"
+                        />
+                    </div>
+
+                    <div className="input-group">
                         <label>Embed Title (ชื่อหัวข้อ)</label>
                         <input
                             type="text"
@@ -138,10 +149,11 @@ const DiscordModal = ({ isOpen, onClose, url }: DiscordModalProps) => {
                     <div className="discord-preview">
                         <div className="discord-preview-label">Preview:</div>
                         <div className="discord-embed-preview" style={{ borderLeftColor: color }}>
-                            <div className="discord-embed-title">{title}</div>
-                            <div className="discord-embed-code-block">
-                                {url}
+                            <div className="discord-embed-author">
+                                👤 ผู้ส่ง: {senderName || 'Anonymous'}
                             </div>
+                            <div className="discord-embed-title">{title}</div>
+                            <div className="discord-embed-code-block">{url}</div>
                         </div>
                     </div>
 

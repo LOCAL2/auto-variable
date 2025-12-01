@@ -4169,6 +4169,16 @@ code::-webkit-scrollbar-corner {
   font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.discord-embed-author {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .discord-embed-title {
   font-size: 1rem;
   font-weight: 600;
@@ -4176,17 +4186,60 @@ code::-webkit-scrollbar-corner {
   margin-bottom: 0.5rem;
 }
 
+.discord-embed-description {
+  font-size: 0.9rem;
+  color: #dcddde;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.discord-embed-field {
+  margin-top: 0.75rem;
+}
+
+.discord-embed-field-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.discord-embed-field-value {
+  font-size: 0.85rem;
+  color: #dcddde;
+  line-height: 1.4;
+}
+
+.discord-embed-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.discord-embed-field-inline {
+  min-width: 0;
+}
+
 .discord-embed-code-block {
   background: #2f3136;
   border: 1px solid #202225;
   border-radius: 4px;
   padding: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85rem;
   color: #b9bbbe;
   word-break: break-all;
   overflow-x: auto;
+}
+
+.discord-embed-footer {
+  font-size: 0.75rem;
+  color: #72767d;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .btn-discord {
